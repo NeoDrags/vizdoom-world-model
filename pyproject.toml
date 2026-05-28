@@ -1,0 +1,26 @@
+[project]
+name = "vizdoom-world-model"
+version = "0.1.0"
+description = "An implementation of vizdoom world model from the paper"
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "numpy>=2.0",
+    "torch",
+    "torchvision",
+    "vizdoom",
+]
+
+[tool.uv]
+
+# PyTorch CUDA wheels
+# Change cu128 -> cu126/cu124 depending on your installed CUDA driver support
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu130" }
+torchvision = { index = "pytorch-cu130" }
