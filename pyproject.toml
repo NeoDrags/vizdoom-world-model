@@ -10,6 +10,7 @@ dependencies = [
     "torch",
     "tqdm",
     "pyyaml",
+    "matplotlib",
     "torchvision",
     "vizdoom",
 ]

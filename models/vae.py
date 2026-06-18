@@ -25,7 +25,6 @@ class VAE(nn.Module):
             nn.ConvTranspose2d(16, 8, 4, 2, 1), # 16 -> 32
             nn.ReLU(),
             nn.ConvTranspose2d(8, 3, 4, 2, 1), # 32 -> 64
-            nn.ReLU(),
         )
 
     def reparametrize(self, mu, logvar):

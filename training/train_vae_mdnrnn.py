@@ -28,25 +28,27 @@ if CONFIG["vae"]["train"]:
         yaml.dump(CONFIG, f)
 VAE_MODEL_LOC = CONFIG["vae"]["model-path"]
 
-def train_vae(vae, dataloader, lr, epochs, device):
+def train_vae(vae, dataloader, lr, epochs, device, beta):
     optimizer = optim.Adam(vae.parameters(), lr)
     lowest_loss = float(np.inf)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min")
     for epoch in range(epochs):
         pbar = tqdm(dataloader, desc=f"Training Epoch: {epoch + 1}/{epochs}")
         total_loss = 0
+        e_id = 1
         for episode in pbar:
             episode = episode.to(device)
             x_hat, mu, logvar = vae(episode)
             recon_loss = F.binary_cross_entropy_with_logits(x_hat, episode, reduction="mean")
             kl = -0.5 * torch.mean(1 + logvar - mu.pow(2) - logvar.exp())
-            kl = torch.clamp(kl, min=0.3)
-            loss = recon_loss + kl
+            kl = torch.clamp(kl, min=0.2)
+            loss = recon_loss + beta * kl
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            total_loss += loss.item() / len(pbar)
+            total_loss += loss.item() / e_id
             pbar.set_postfix({"loss": total_loss, "kl_loss": kl.item(), "recon_loss": recon_loss.item()})
+            e_id += 1
         if total_loss < lowest_loss:
             lowest_loss = total_loss
             torch.save(vae.state_dict(), VAE_MODEL_LOC)
@@ -66,7 +68,8 @@ def main():
             dataloader=frames_loader,
             lr=float(VAE_TRAINING_PARAMS["lr"]),
             epochs=int(VAE_TRAINING_PARAMS["epochs"]),
-            device=DEVICE
+            device=DEVICE,
+            beta = float(VAE_TRAINING_PARAMS["beta"])
         )
     else:
         vae_dict = torch.load(VAE_MODEL_LOC)

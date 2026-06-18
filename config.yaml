@@ -1,11 +1,10 @@
-episodes: 10
+episodes: 200
 vae:
-  model-path: ./trained_models/vae_20260618_143411.pt
-  train: true
+  model-path: ./vae-best.pt
+  train: False
   training-params:
     batch-size: 16
-    epochs: 20
+    beta: 0.1
+    epochs: 50
     lr: 1e-4
 vizdoom-env: VizdoomDefendLine-v1
-
-    
