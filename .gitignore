@@ -1,3 +1,7 @@
+trained_models/
+*.ini
+*.lock
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
