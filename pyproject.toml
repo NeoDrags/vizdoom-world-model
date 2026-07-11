@@ -13,6 +13,7 @@ dependencies = [
     "matplotlib",
     "torchvision",
     "vizdoom",
+    "cma"
 ]
 
 [tool.uv]

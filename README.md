@@ -19,11 +19,11 @@ uv run training/train_vae_rnn.py
 
 We broadly divide our model into 3 parts. VAE, MDNRNN and the Controlller. Each part has been described.
 
-### VAE
+### Variational Auto Encoder (VAE)
 
 <center>The vae model architecture is as listed below.</center>
 
-![VAE Model Architcture](./imgs/image.png)
+![VAE Model Architcture](./imgs/vae-model.png)
 <details>
 
 <summary> Some visualized images </summary>

@@ -16,7 +16,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 env = gymnasium.make(CONFIG["vizdoom-env"],screen_resolution=vizdoom.ScreenResolution.RES_200X125)
 
-frames, _, _, _ = collect_rollouts(
+frames, _, _ = collect_rollouts(
     env,
     episodes=1
 )
@@ -60,5 +60,5 @@ ax[1].set_title("Reconstruction")
 ax[1].axis("off")
 
 plt.tight_layout()
-plt.savefig("./imgs/vae_reconstruction_2.png", dpi=300)
+plt.savefig("./imgs/vae_reconstruction_3.png", dpi=300)
 plt.close()

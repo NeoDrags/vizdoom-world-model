@@ -1,10 +1,28 @@
-episodes: 200
+# Vizdoom Config
+episodes: 100
+vizdoom-env: VizdoomDefendLine-v1
+
+# Overall model parameters (Reference vizdoom docs)
+latent-dim: 64
+action-dim: 4
+game-state-dim: 2
+
+# Vae Parameters
 vae:
   model-path: ./vae-best.pt
-  train: False
+  train: True
   training-params:
     batch-size: 16
     beta: 0.1
     epochs: 50
     lr: 1e-4
-vizdoom-env: VizdoomDefendLine-v1
+
+mdnrnn:
+  model-path: ./trained_models/latest_mdnrnn.pt
+  train: False
+  training-params:
+    mixtures: 5
+    hidden-dim: 32
+    batch-size: 16
+    epochs: 30
+    lr: 1e-3
