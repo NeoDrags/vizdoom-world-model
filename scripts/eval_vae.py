@@ -21,7 +21,7 @@ frames, _, _ = collect_rollouts(
     episodes=1
 )
 
-vae = VAE()
+vae = VAE(CONFIG["latent-dim"])
 vae.load_state_dict(torch.load(CONFIG["vae"]["model-path"], map_location=DEVICE))
 
 vae = vae.to(DEVICE)
@@ -60,5 +60,5 @@ ax[1].set_title("Reconstruction")
 ax[1].axis("off")
 
 plt.tight_layout()
-plt.savefig("./imgs/vae_reconstruction_3.png", dpi=300)
+plt.savefig("./imgs/vae_reconstruction.png", dpi=300)
 plt.close()
