@@ -1,5 +1,5 @@
 # Vizdoom Config
-episodes: 1
+episodes: 30
 vizdoom-env: VizdoomDefendLine-v1
 
 # Overall model parameters (Reference vizdoom docs)
@@ -28,3 +28,4 @@ mdnrnn:
     lr: 1e-3
     lambda-reward: 1
     lambda-done: 1
+    seq-length: 32

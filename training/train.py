@@ -75,6 +75,8 @@ def main():
                 rewards=rewards,
                 done_state=done,
                 device=DEVICE,
+                batch_size=int(MDNRNN_TRAINING_PARAMS["batch-size"]),
+                seq_length=int(MDNRNN_TRAINING_PARAMS.get("seq-length", 32)),
                 lambda_reward=float(MDNRNN_TRAINING_PARAMS["lambda-reward"]),
                 lambda_done=float(MDNRNN_TRAINING_PARAMS["lambda-done"])
                 )
