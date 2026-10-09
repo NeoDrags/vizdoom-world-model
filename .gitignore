@@ -2,6 +2,7 @@ trained_models/
 out/
 *.ini
 *.lock
+_vizdoom.ini
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

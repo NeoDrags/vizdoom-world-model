@@ -10,6 +10,7 @@ dependencies = [
     "torch",
     "tqdm",
     "pyyaml",
+    "scikit-learn",
     "matplotlib",
     "torchvision",
     "vizdoom",

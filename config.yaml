@@ -1,5 +1,5 @@
 # Vizdoom Config
-episodes: 30
+episodes: 125
 vizdoom-env: VizdoomDefendLine-v1
 
 # Overall model parameters (Reference vizdoom docs)
@@ -24,8 +24,8 @@ mdnrnn:
     mixtures: 5
     hidden-dim: 32
     batch-size: 16
-    epochs: 30
-    lr: 1e-3
-    lambda-reward: 1
+    epochs: 200
+    lr: 5e-4
+    lambda-reward: 5e-3
     lambda-done: 1
     seq-length: 32

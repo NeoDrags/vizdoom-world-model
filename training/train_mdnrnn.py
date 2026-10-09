@@ -5,6 +5,7 @@ import torch.nn.functional as F
 from tqdm import tqdm
 from datetime import datetime
 import random
+import math
 
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
@@ -42,7 +43,7 @@ def create_sequence_batches(frames, actions, game_states, rewards, done_state, s
             ep_d = torch.as_tensor(ep_done, dtype=torch.float32)
         else:
             ep_d = ep_done.float() if isinstance(ep_done, torch.Tensor) else torch.as_tensor(ep_done, dtype=torch.float32)
-        for i in range(0, len(ep_z) - seq_length):
+        for i in range(0, len(ep_z) - seq_length + 1):
             sequences.append((ep_z[i:i + seq_length], ep_a[i:i + seq_length], ep_g[i:i + seq_length], ep_r[i:i + seq_length], ep_d[i:i + seq_length]))
     random.shuffle(sequences)
     for i in range(0, len(sequences), batch_size):
@@ -96,13 +97,27 @@ def train_mdnrnn(vae, mdnrnn, lr, epochs, frames, actions, game_states, rewards,
             done_proc.append(ep_d.float())
         else:
             done_proc.append(torch.as_tensor(ep_d, dtype=torch.float32))
+    # Calculate positive class weight for done predictions
+    total_done = sum((ep_d > 0.5).sum().item() for ep_d in done_proc)
+    total_not_done = sum((ep_d <= 0.5).sum().item() for ep_d in done_proc)
+    pos_weight = None
+    if total_done > 0 and total_not_done > 0:
+        pos_weight = torch.tensor([total_not_done / total_done], device=device)
+    print(pos_weight)
+
     optimizer = optim.Adam(mdnrnn.parameters(), lr)
     lowest_loss = float(np.inf)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min")
+
+    total_sequences = sum(max(0, len(ep) - seq_length + 1) for ep in frames)
+    total_batches = math.ceil(total_sequences / batch_size)
+    if total_batches == 0:
+        raise ValueError("No sequences available; check seq_length and training data.")
+
     for epoch in range(epochs):
         pbar = tqdm(
             create_sequence_batches(frames, actions_proc, game_states_proc, rewards_proc, done_proc, seq_length, batch_size),
-            total=len(frames),
+            total=total_batches,
             desc=f"Training Epoch: {epoch + 1}/{epochs}"
         )
         total_loss = 0
@@ -125,7 +140,7 @@ def train_mdnrnn(vae, mdnrnn, lr, epochs, frames, actions, game_states, rewards,
             gmm, h, c, r, d = mdnrnn(z=z_in, a=a_in, g=g_in, h=h, c=c)
             z_pred_loss = -gmm.log_prob(z_out.reshape(-1, z_out.size(-1))).reshape(z_out.shape[0], z_out.shape[1]).mean()
             r_pred_loss = F.mse_loss(r, r_target)
-            done_pred_loss = F.binary_cross_entropy_with_logits(d, d_target)
+            done_pred_loss = F.binary_cross_entropy_with_logits(d, d_target, pos_weight=pos_weight)
             loss = z_pred_loss + lambda_reward * r_pred_loss + lambda_done * done_pred_loss
             optimizer.zero_grad()
             loss.backward()
@@ -143,4 +158,4 @@ def train_mdnrnn(vae, mdnrnn, lr, epochs, frames, actions, game_states, rewards,
             torch.save(mdnrnn.state_dict(), f"./trained_models/mdnrnn_{timestamp}.pt")
             torch.save(mdnrnn.state_dict(), './trained_models/latest_mdnrnn.pt')
             print(f"Saving model... loss = {curr_loss}")
-        scheduler.step(total_loss)
+        scheduler.step(curr_loss)
